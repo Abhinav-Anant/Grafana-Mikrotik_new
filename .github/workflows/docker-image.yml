@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag grafana-prometheus:$(date +%s)
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: abhinav
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Push image to Docker Hub
+      run: |
+        docker tag grafana-prometheus:$(date +%s) abhinav/grafana-prometheus:latest
+        docker push abhinav/grafana-prometheus:latest
